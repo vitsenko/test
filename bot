@@ -1,0 +1,133 @@
+import sqlite3
+import re
+
+class Karmabot:
+    def __init__(self):
+        self.conn = sqlite3.connect(db_name)
+        self.create_table()
+        self.get_info_from_message()
+
+    def create_table(self):
+        cursor = self.conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS karma (
+id INTEGER PRIMARY KEY AUTOINCREMENT, user_from TEXT, user_to TEXT, karma_change INTEGER,
+message TEXT, datetime INTEGER)''')
+        self.conn.commit()
+
+    def get_info_from_message(self, message):
+        # Отримуємо інфо про повідомлення
+        message_id = message.id
+        date_time = message.message.date
+        text = message.text
+        chat_id = message.chat.id
+        # Отримуємо інфо про відправника повідомлення
+        user_from_id = message.from_user.id
+        user_from_username = message.from_user.username
+        user_from_name = message.from_user.first_name
+        user_from_surname = message.from_user.last_name
+        # Отримуємо інфо про отримувача карми
+        user_to = None
+            for entity in message.entities:
+                if entity.type == 'text_mention':
+                    user_to = entity.user
+                    if user_to:
+                        user_to_id = user_to.id
+                        user_to_usernamr = user_to.username
+                        user_to_name = user_to.first_name
+                        user_to_surname = user_to.last_name
+            else:
+                # Регулярний вираз для пошуку імені користувача в тексті повідомлення
+                username_regex = re.compile(r'@(\w+)')
+                # Знаходження імені користувача в тексті повідомлення
+                match = username_regex.search(text)
+                if match:
+                    user_to_username = match.group(1)
+                    user_to_id = user_to_username
+                ### Код запиту до таблиці users для отримання name, surname по полям user_id або username
+
+        return()
+
+    def check_control_rules(self):
+        #перевірка на зміну карми собі
+        add_karma = True
+        if user_from_username == user_to_username:
+            add_karma = False
+
+        # перевірка частоти зміни карми одному користувачу    
+        cursor = self.conn.cursor()
+        cursor.execute('''SELECT datetime FROM karma WHERE user_from_username = ? AND user_to_username = ? ORDER BY datetime DESC LIMIT 1''')
+        result = cursor.fetchone()
+        #дописати
+        if :
+            add_karma = False
+
+
+        
+        
+        
+
+    def get_karma_change_value(self, text):
+        karma_regex = re.compile(r'.*(карма\s*[+\-]).*', re.IGNORECASE)
+        match = karma_regex.search(text)
+        if match:
+            karma_change = match.group(1)
+            if karma_change.lower() == 'карма +':
+                karma_value = 1
+            elif karma_change.lower() == 'карма -':
+                karma_value = -1
+            else:
+                karma_value = 0
+        if karma_value = -1 or 1:
+        return karma_value  
+        
+    def change_karma(self, user_to, user_from, karma_value, add_to_karma):
+        if add_to_karma = True:
+            cursor = self.conn.cursor()
+            cursor.execute('''INSERT INTO karma (user_from, user_to, karma_change) VALUES (?, ?, ?)''', (user_from, user_to, karma_value))
+            self.conn.commit()
+        elif add_to_karma = False:
+            #Відправити повідомлення в групу
+        
+
+    def get_karma(self):
+        cursor = self.conn.cursor()
+        cursor.execute('''SELECT user_to, SUM(karma_change) as total_value FROM karma GROUP BY user_to''')
+        result = cursor.fetchall()
+        if result:
+            message = 'Статус карми\n'
+            for row in result:
+                user_to, total_value = row
+                message += f'{user_to}: {total_value}\n"
+        return message
+
+    def close_db_connection(self):
+        self.cursor.close()
+        self.connection.close()
+
+
+
+###############################################################
+bot = telebot.TeleBot(os.environ['BOT_TOKEN'])
+
+
+# Обробник команди karma_status. Відправляю дашборд по кармі в групу
+@bot.message_handler(commands=['karma_status'])
+karma_init = Karmabot()
+karma_info = karma_init.get_karma()
+bot.send_message(message.chat.id, karma_info)
+    
+
+
+# Визначення глобальної змінної karma_regex (пошук слова Карма+- без врахування регістру)
+karma_regex = re.compile(r'.*(карма\s*[+\-]).*', re.IGNORECASE)
+
+@bot.message_handler(func=lambda message: message.chat.type == 'group' or message.chat.type == 'supergroup'  and karma_regex.search(message.text))
+karma_init = Karmabot()
+message_info = karma_init.get_info_from_message()
+add_karma_value = message_info.change_karma()
+
+bot.send_message(message.chat.id, 
+            
+
+
+    
